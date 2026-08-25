@@ -1,0 +1,9 @@
+{
+  "name":"MNP-CARD Manager",
+  "short_name":"MNP-CARD",
+  "start_url":"./",
+  "display":"standalone",
+  "background_color":"#f3f5f9",
+  "theme_color":"#0f172a",
+  "lang":"zh-CN"
+}

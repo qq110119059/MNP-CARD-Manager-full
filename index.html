@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<title>MNP-CARD Manager</title>
+<style>
+:root{--bg:#f3f5f9;--panel:#fff;--text:#172033;--muted:#667085;--line:#e5e7eb;--primary:#2563eb;--primary2:#1d4ed8;--danger:#dc2626;--success:#16a34a;--warning:#d97706;--shadow:0 8px 24px rgba(15,23,42,.07)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}header{position:sticky;top:0;z-index:20;background:#0f172a;color:white;box-shadow:0 2px 12px #0002}
+.header{max-width:1240px;margin:auto;padding:14px 16px}.brand{font-size:20px;font-weight:800}.sub{font-size:12px;color:#cbd5e1;margin-top:2px}
+.nav{display:flex;gap:7px;overflow:auto;margin-top:13px}.nav button{border:0;background:#1e293b;color:#cbd5e1;padding:9px 13px;border-radius:10px;white-space:nowrap}.nav button.active{background:#fff;color:#0f172a}
+main{max-width:1240px;margin:auto;padding:20px 16px 80px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}.stat .v{font-size:25px;font-weight:800;margin-top:5px}.muted{color:var(--muted);font-size:13px}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:20px 0 12px}.toolbar .left,.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:#fff;padding:9px 13px;border-radius:10px}.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}.btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}.btn.success{background:var(--success);border-color:var(--success);color:#fff}
+.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}.panel h2,.panel h3{margin:0 0 8px}
+table{width:100%;border-collapse:collapse}.table-wrap{overflow:auto}.table-wrap table{min-width:760px}th,td{padding:11px 10px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}th{font-size:12px;color:var(--muted);background:#f8fafc;position:sticky;top:0}.tag{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:12px}.tag.ok{background:#ecfdf3;color:#166534}.tag.warn{background:#fff7ed;color:#9a3412}.tag.bad{background:#fef2f2;color:#991b1b}
+.search{width:min(360px,100%);border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff}.filters{display:flex;gap:8px;flex-wrap:wrap}.filters select{width:auto;min-width:130px}
+input,select,textarea{width:100%;border:1px solid #d1d5db;border-radius:10px;padding:10px;background:#fff;color:var(--text)}textarea{min-height:90px;resize:vertical}label{display:block;font-size:12px;color:var(--muted);margin:0 0 5px}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.full{grid-column:1/-1}
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.credit-card{background:#111827;color:#fff;border-radius:18px;padding:18px;min-height:170px;position:relative;overflow:hidden}.credit-card:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:-70px;top:-70px;background:#fff1}.cc-bank{font-size:12px;color:#cbd5e1}.cc-name{font-size:19px;font-weight:800;margin-top:16px}.cc-number{letter-spacing:2px;margin-top:20px}.cc-bottom{display:flex;justify-content:space-between;margin-top:14px;font-size:12px;color:#cbd5e1}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.mini{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:12px}.mini b{font-size:18px}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:50;align-items:flex-end;justify-content:center}.modal.show{display:flex}.sheet{background:#fff;width:min(760px,100%);max-height:94vh;overflow:auto;border-radius:20px 20px 0 0;padding:20px}.sheet-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.sheet h2{margin:0}.close{border:0;background:#f1f5f9;border-radius:50%;width:34px;height:34px}
+.expense{border:1px solid var(--line);border-radius:12px;padding:12px;margin:9px 0}.expense-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+.empty{text-align:center;padding:40px;color:var(--muted)}.alert{padding:12px;border-radius:12px;background:#fff7ed;color:#9a3412;margin:8px 0}.okbox{padding:12px;border-radius:12px;background:#ecfdf3;color:#166534;margin:8px 0}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111827;color:#fff;padding:11px 16px;border-radius:12px;display:none;z-index:100}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.cards-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){main{padding:14px 10px 70px}.grid{grid-template-columns:repeat(2,1fr)}.cards-grid{grid-template-columns:1fr}.formgrid{grid-template-columns:1fr}.full{grid-column:auto}.stat{padding:12px}.stat .v{font-size:20px}.toolbar{align-items:flex-start}.kpis{grid-template-columns:1fr}.brand{font-size:18px}}
+</style>
+</head>
+<body>
+<header><div class="header">
+  <div class="brand">MNP-CARD Manager</div><div class="sub">手机号 · MNP · 信用卡 · 固定支出 · 提醒</div>
+  <div class="nav" id="nav"></div>
+</div></header>
+<main id="app"></main>
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+<input id="importFile" type="file" accept=".json" hidden>
+<script>
+const KEY='mnp_card_manager_full_v1';
+let db=load();
+let page='dashboard', search='', cardFilter='all', phoneFilter='all';
+
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY)||'');if(x&&x.cards&&x.phones)return x}catch(e){}return {cards:[],phones:[],settings:{currency:'JPY'}}}
+function save(){localStorage.setItem(KEY,JSON.stringify(db));toast('已保存');render()}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+function yen(n){return new Intl.NumberFormat('ja-JP',{style:'currency',currency:'JPY',maximumFractionDigits:0}).format(Number(n)||0)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function toast(s){const t=document.getElementById('toast');t.textContent=s;t.style.display='block';clearTimeout(window._toast);window._toast=setTimeout(()=>t.style.display='none',1800)}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+
+function fixedTotal(c){return (c.expenses||[]).filter(e=>e.active!==false).reduce((a,e)=>a+Number(e.amount||0),0)}
+function allFixed(){return db.cards.reduce((a,c)=>a+fixedTotal(c),0)}
+function annualFees(){return db.cards.reduce((a,c)=>a+Number(c.annualFee||0),0)}
+function annualFixed(){return allFixed()*12}
+function today(){return new Date().toISOString().slice(0,10)}
+function daysTo(d){if(!d)return null;return Math.ceil((new Date(d)-new Date(today()))/86400000)}
+function phoneStatus(p){if(p.status==='已解约')return ['已解约','bad'];let n=daysTo(p.mnp);if(n!==null&&n<=7&&n>=0)return ['MNP临近','warn'];return [p.status||'使用中','ok']}
+
+function render(){
+ document.getElementById('nav').innerHTML=[
+  ['dashboard','首页'],['cards','信用卡'],['phones','手机号/MNP'],['expenses','固定支出'],['settings','设置']
+ ].map(([id,n])=>`<button class="${page===id?'active':''}" onclick="page='${id}';render()">${n}</button>`).join('');
+ ({dashboard:dashboard,cards:cards,phones:phones,expenses:expenses,settings:settings}[page]||dashboard)();
+}
+
+function dashboard(){
+ const near=db.phones.filter(p=>{const n=daysTo(p.mnp);return n!==null&&n>=0&&n<=30});
+ document.getElementById('app').innerHTML=`
+ <div class="grid">
+  <div class="stat"><div class="muted">信用卡</div><div class="v">${db.cards.length}</div></div>
+  <div class="stat"><div class="muted">手机号</div><div class="v">${db.phones.length}</div></div>
+  <div class="stat"><div class="muted">每月固定支出</div><div class="v">${yen(allFixed())}</div></div>
+  <div class="stat"><div class="muted">全年固定支出</div><div class="v">${yen(annualFixed())}</div></div>
+ </div>
+ <div class="toolbar"><div><h2>总览</h2><div class="muted">所有关键数据集中在这里。</div></div><div class="actions"><button class="btn primary" onclick="editCard()">＋信用卡</button><button class="btn" onclick="editPhone()">＋手机号</button></div></div>
+ ${near.length?`<div class="panel"><h3>🔔 未来30天 MNP提醒</h3>${near.map(p=>{let n=daysTo(p.mnp);return `<div class="alert"><b>${esc(p.number)}</b> · ${esc(p.carrier)} · MNP日期 ${esc(p.mnp)} · ${n===0?'今天':n+'天后'}</div>`}).join('')}</div>`:`<div class="panel"><div class="okbox">目前没有未来30天内的 MNP 日期提醒。</div></div>`}
+ <div class="toolbar"><h2>信用卡固定支出</h2></div>
+ ${db.cards.length?`<div class="cards-grid">${db.cards.map(cardTile).join('')}</div>`:'<div class="panel empty">还没有信用卡。点击“＋信用卡”开始。</div>'}
+ <div class="panel" style="margin-top:12px"><h3>固定支出统计</h3><div class="kpis">
+  <div class="mini">每月 <b>${yen(allFixed())}</b></div><div class="mini">全年 <b>${yen(annualFixed())}</b></div><div class="mini">固定项目 <b>${db.cards.reduce((a,c)=>a+(c.expenses||[]).length,0)}</b> 项</div>
+ </div></div>`;
+}
+function cardTile(c){return `<div class="credit-card"><div class="cc-bank">${esc(c.bank||'')}</div><div class="cc-name">${esc(c.name||'未命名')}</div><div class="cc-number">•••• •••• •••• ${esc((c.number||'').slice(-4)||'----')}</div><div class="cc-bottom"><span>额度 ${yen(c.limit)}</span><span>${yen(fixedTotal(c))}/月</span></div><div class="actions" style="margin-top:12px;position:relative;z-index:2"><button class="btn" onclick="editCard('${c.id}')">编辑</button><button class="btn" onclick="viewCard('${c.id}')">固定支出</button></div></div>`}
+
+function cards(){
+ const list=db.cards.filter(c=>(c.name+' '+c.bank+' '+c.number).toLowerCase().includes(search.toLowerCase()));
+ document.getElementById('app').innerHTML=`<div class="toolbar"><div><h2>信用卡管理</h2><div class="muted">额度、年费、还款信息和固定支出</div></div><div class="actions"><input class="search" placeholder="搜索卡名/银行/卡号" value="${esc(search)}" oninput="search=this.value;cards()"><button class="btn primary" onclick="editCard()">＋新增</button></div></div>
+ ${list.length?`<div class="table-wrap"><table><thead><tr><th>信用卡</th><th>额度</th><th>年费</th><th>每月固定</th><th>固定项目</th><th>计费/还款</th><th>操作</th></tr></thead><tbody>${list.map(c=>`<tr><td><b>${esc(c.name)}</b><div class="muted">${esc(c.bank)}</div></td><td>${yen(c.limit)}</td><td>${yen(c.annualFee)}</td><td><b>${yen(fixedTotal(c))}</b></td><td>${(c.expenses||[]).length}</td><td>${esc(c.billing||'-')} / ${esc(c.payDate||'-')}</td><td><div class="actions"><button class="btn" onclick="editCard('${c.id}')">编辑</button><button class="btn" onclick="viewCard('${c.id}')">详情</button><button class="btn danger" onclick="delCard('${c.id}')">删除</button></div></td></tr>`).join('')}</tbody></table></div>`:'<div class="panel empty">没有符合条件的信用卡。</div>'}`;
+}
+function viewCard(id){
+ const c=db.cards.find(x=>x.id===id);if(!c)return;
+ document.getElementById('sheet').innerHTML=`<div class="sheet-head"><div><h2>${esc(c.name)}</h2><div class="muted">${esc(c.bank)} · 每月固定 ${yen(fixedTotal(c))}</div></div><button class="close" onclick="closeModal()">×</button></div>
+ <div class="kpis" style="margin:16px 0"><div class="mini">额度 <b>${yen(c.limit)}</b></div><div class="mini">年费 <b>${yen(c.annualFee)}</b></div><div class="mini">全年固定 <b>${yen(fixedTotal(c)*12)}</b></div></div>
+ <h3>固定支出明细</h3>${(c.expenses||[]).length?(c.expenses||[]).map(e=>`<div class="expense"><b>${esc(e.name)}</b>　${yen(e.amount)}/月 <span class="tag ${e.active===false?'bad':'ok'}">${e.active===false?'已停止':'继续'}</span><div class="muted">扣款日：${esc(e.day||'-')} · 类别：${esc(e.cat||'-')} · ${esc(e.note||'')}</div></div>`).join(''):'<div class="empty">暂无固定支出</div>'}
+ <div class="toolbar"><button class="btn" onclick="closeModal()">关闭</button><button class="btn primary" onclick="closeModal();editCard('${c.id}')">编辑</button></div>`;
+ document.getElementById('modal').classList.add('show');
+}
+
+function editCard(id){
+ const old=db.cards.find(c=>c.id===id);
+ const c=old||{id:uid(),name:'',bank:'',number:'',expiry:'',limit:0,annualFee:0,billing:'',payDate:'',notes:'',expenses:[]};
+ document.getElementById('sheet').innerHTML=`<div class="sheet-head"><h2>${old?'编辑':'新增'}信用卡</h2><button class="close" onclick="closeModal()">×</button></div>
+ <div class="formgrid" style="margin-top:14px">
+ <div><label>卡名称 *</label><input id="c_name" value="${esc(c.name)}" placeholder="例：レクサスカード プラチナ/V"></div><div><label>发卡银行</label><input id="c_bank" value="${esc(c.bank)}"></div>
+ <div><label>卡号（建议只保存后4位）</label><input id="c_number" value="${esc(c.number)}"></div><div><label>有效期</label><input id="c_expiry" value="${esc(c.expiry)}" placeholder="MM/YY"></div>
+ <div><label>信用额度</label><input id="c_limit" type="number" value="${c.limit}"></div><div><label>年费</label><input id="c_fee" type="number" value="${c.annualFee}"></div>
+ <div><label>计费周期</label><input id="c_billing" value="${esc(c.billing)}" placeholder="例：每月15日締め"></div><div><label>还款日</label><input id="c_pay" value="${esc(c.payDate)}" placeholder="例：翌月10日"></div>
+ <div class="full"><label>备注</label><textarea id="c_notes">${esc(c.notes)}</textarea></div></div>
+ <hr><div class="toolbar"><h3 style="margin:0">每月固定支出 <span class="tag">${yen(fixedTotal(c))}/月</span></h3><button class="btn" onclick="addExpenseEditor()">＋添加固定支出</button></div>
+ <div id="expenseEditor">${(c.expenses||[]).map((e,i)=>expenseEditor(e,i)).join('')}</div>
+ <div class="toolbar"><button class="btn" onclick="closeModal()">取消</button><button class="btn primary" onclick="saveCard('${c.id}')">保存</button></div>`;
+ document.getElementById('modal').classList.add('show');
+}
+function expenseEditor(e,i){return `<div class="expense"><div class="expense-top"><b>固定支出 ${i+1}</b><button class="btn" onclick="this.closest('.expense').remove()">删除</button></div><div class="formgrid">
+<div><label>支出名称</label><input class="e_name" value="${esc(e.name)}" placeholder="手机费/网络/保险/会员"></div><div><label>每月金额</label><input class="e_amount" type="number" value="${e.amount||0}"></div>
+<div><label>扣款日</label><input class="e_day" value="${esc(e.day||'')}"></div><div><label>类别</label><input class="e_cat" value="${esc(e.cat||'')}"></div>
+<div><label>状态</label><select class="e_active"><option value="true" ${e.active!==false?'selected':''}>继续</option><option value="false" ${e.active===false?'selected':''}>已停止</option></select></div><div><label>备注</label><input class="e_note" value="${esc(e.note||'')}"></div>
+</div></div>`}
+function addExpenseEditor(){document.getElementById('expenseEditor').insertAdjacentHTML('beforeend',expenseEditor({name:'',amount:0,day:'',cat:'',active:true,note:''},document.querySelectorAll('#expenseEditor .expense').length))}
+function saveCard(id){
+ let c=db.cards.find(x=>x.id===id);if(!c){c={id};db.cards.push(c)}
+ c.name=document.getElementById('c_name').value.trim();c.bank=document.getElementById('c_bank').value.trim();c.number=document.getElementById('c_number').value.trim();c.expiry=document.getElementById('c_expiry').value.trim();c.limit=Number(document.getElementById('c_limit').value||0);c.annualFee=Number(document.getElementById('c_fee').value||0);c.billing=document.getElementById('c_billing').value.trim();c.payDate=document.getElementById('c_pay').value.trim();c.notes=document.getElementById('c_notes').value;
+ c.expenses=[...document.querySelectorAll('#expenseEditor .expense')].map(x=>({id:uid(),name:x.querySelector('.e_name').value.trim(),amount:Number(x.querySelector('.e_amount').value||0),day:x.querySelector('.e_day').value.trim(),cat:x.querySelector('.e_cat').value.trim(),active:x.querySelector('.e_active').value==='true',note:x.querySelector('.e_note').value.trim()}));
+ if(!c.name){toast('请填写卡名称');return}localStorage.setItem(KEY,JSON.stringify(db));closeModal();toast('信用卡已保存');render();
+}
+function delCard(id){if(confirm('确定删除这张信用卡及其固定支出吗？')){db.cards=db.cards.filter(c=>c.id!==id);save()}}
+
+function phones(){
+ const carriers=[...new Set(db.phones.map(p=>p.carrier).filter(Boolean))];
+ let list=db.phones.filter(p=>(p.number+' '+p.carrier+' '+p.owner+' '+p.plan).toLowerCase().includes(search.toLowerCase())&&(phoneFilter==='all'||p.carrier===phoneFilter));
+ document.getElementById('app').innerHTML=`<div class="toolbar"><div><h2>手机号 / MNP</h2><div class="muted">运营商、契约日、MNP日期和月费</div></div><div class="actions"><input class="search" placeholder="搜索手机号/运营商/名义人" value="${esc(search)}" oninput="search=this.value;phones()"><select onchange="phoneFilter=this.value;phones()"><option value="all">全部运营商</option>${carriers.map(x=>`<option ${phoneFilter===x?'selected':''}>${esc(x)}</option>`).join('')}</select><button class="btn primary" onclick="editPhone()">＋新增</button></div></div>
+ ${list.length?`<div class="table-wrap"><table><thead><tr><th>手机号</th><th>运营商</th><th>名义人</th><th>契约日</th><th>MNP日期</th><th>月费</th><th>状态</th><th>操作</th></tr></thead><tbody>${list.map(p=>{const [st,cl]=phoneStatus(p);return `<tr><td><b>${esc(p.number)}</b></td><td>${esc(p.carrier)}</td><td>${esc(p.owner)}</td><td>${esc(p.start)}</td><td>${esc(p.mnp)}</td><td>${yen(p.fee)}</td><td><span class="tag ${cl}">${st}</span></td><td><div class="actions"><button class="btn" onclick="editPhone('${p.id}')">编辑</button><button class="btn danger" onclick="delPhone('${p.id}')">删除</button></div></td></tr>`}).join('')}</tbody></table></div>`:'<div class="panel empty">没有手机号。</div>'}`;
+}
+function editPhone(id){
+ const old=db.phones.find(p=>p.id===id);const p=old||{id:uid(),number:'',carrier:'',owner:'',start:'',mnp:'',plan:'',fee:0,sim:'',status:'使用中',notes:''};
+ document.getElementById('sheet').innerHTML=`<div class="sheet-head"><h2>${old?'编辑':'新增'}手机号</h2><button class="close" onclick="closeModal()">×</button></div>
+ <div class="formgrid" style="margin-top:14px">
+ <div><label>手机号</label><input id="p_number" value="${esc(p.number)}"></div><div><label>运营商</label><input id="p_carrier" value="${esc(p.carrier)}" placeholder="UQ / Y!mobile / docomo / LINEMO / povo"></div>
+ <div><label>契约名义人</label><input id="p_owner" value="${esc(p.owner)}"></div><div><label>契约日期</label><input id="p_start" type="date" value="${esc(p.start)}"></div>
+ <div><label>MNP可操作日期</label><input id="p_mnp" type="date" value="${esc(p.mnp)}"></div><div><label>套餐</label><input id="p_plan" value="${esc(p.plan)}"></div>
+ <div><label>月费</label><input id="p_fee" type="number" value="${p.fee}"></div><div><label>SIM / eSIM</label><input id="p_sim" value="${esc(p.sim)}"></div>
+ <div><label>状态</label><select id="p_status">${['使用中','准备MNP','已MNP','已解约'].map(s=>`<option ${p.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+ <div class="full"><label>备注</label><textarea id="p_notes">${esc(p.notes)}</textarea></div></div>
+ <div class="toolbar"><button class="btn" onclick="closeModal()">取消</button><button class="btn primary" onclick="savePhone('${p.id}')">保存</button></div>`;
+ document.getElementById('modal').classList.add('show');
+}
+function savePhone(id){
+ let p=db.phones.find(x=>x.id===id);if(!p){p={id};db.phones.push(p)}
+ p.number=document.getElementById('p_number').value.trim();p.carrier=document.getElementById('p_carrier').value.trim();p.owner=document.getElementById('p_owner').value.trim();p.start=document.getElementById('p_start').value;p.mnp=document.getElementById('p_mnp').value;p.plan=document.getElementById('p_plan').value.trim();p.fee=Number(document.getElementById('p_fee').value||0);p.sim=document.getElementById('p_sim').value.trim();p.status=document.getElementById('p_status').value;p.notes=document.getElementById('p_notes').value;
+ localStorage.setItem(KEY,JSON.stringify(db));closeModal();toast('手机号已保存');render();
+}
+function delPhone(id){if(confirm('确定删除这个手机号吗？')){db.phones=db.phones.filter(p=>p.id!==id);save()}}
+
+function expenses(){
+ let items=[];db.cards.forEach(c=>(c.expenses||[]).forEach(e=>items.push({...e,card:c.name,cardId:c.id})));
+ const total=items.filter(e=>e.active!==false).reduce((a,e)=>a+Number(e.amount||0),0);
+ document.getElementById('app').innerHTML=`<div class="toolbar"><div><h2>固定支出总表</h2><div class="muted">所有信用卡绑定的固定费用集中查看</div></div></div>
+ <div class="grid"><div class="stat"><div class="muted">每月固定支出</div><div class="v">${yen(total)}</div></div><div class="stat"><div class="muted">全年固定支出</div><div class="v">${yen(total*12)}</div></div><div class="stat"><div class="muted">项目数</div><div class="v">${items.length}</div></div><div class="stat"><div class="muted">启用项目</div><div class="v">${items.filter(e=>e.active!==false).length}</div></div></div>
+ <div class="panel" style="margin-top:14px">${items.length?`<div class="table-wrap"><table><thead><tr><th>项目</th><th>所属信用卡</th><th>金额/月</th><th>扣款日</th><th>类别</th><th>状态</th><th>备注</th></tr></thead><tbody>${items.map(e=>`<tr><td><b>${esc(e.name)}</b></td><td>${esc(e.card)}</td><td>${yen(e.amount)}</td><td>${esc(e.day||'-')}</td><td>${esc(e.cat||'-')}</td><td><span class="tag ${e.active===false?'bad':'ok'}">${e.active===false?'已停止':'继续'}</span></td><td>${esc(e.note||'')}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">还没有固定支出。</div>'}</div>`;
+}
+function settings(){
+ document.getElementById('app').innerHTML=`<div class="toolbar"><div><h2>设置与数据</h2><div class="muted">备份、恢复和网页安装</div></div></div>
+ <div class="panel"><h3>数据备份</h3><p class="muted">当前完整版默认把数据保存在浏览器本机。定期导出 JSON 备份，避免清理浏览器数据造成丢失。</p><div class="actions"><button class="btn primary" onclick="exportJSON()">导出全部数据</button><button class="btn" onclick="document.getElementById('importFile').click()">导入备份</button><button class="btn danger" onclick="resetAll()">清空全部数据</button></div></div>
+ <div class="panel"><h3>安装到手机</h3><p class="muted">如果部署到 HTTPS 网站，在支持 PWA 的手机浏览器中可以选择“添加到主屏幕”，以后像 App 一样打开。</p></div>
+ <div class="panel"><h3>当前统计</h3><div class="kpis"><div class="mini">信用卡 <b>${db.cards.length}</b></div><div class="mini">手机号 <b>${db.phones.length}</b></div><div class="mini">每月固定 <b>${yen(allFixed())}</b></div></div></div>
+ <div class="panel"><h3>下一阶段：云端同步</h3><p class="muted">当前文件已经按“云端同步可扩展”的结构设计。接入 Supabase 后，可以实现电脑和手机自动同步，并加入账号登录。</p></div>`;
+}
+function exportJSON(){const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MNP-CARD-Manager-'+today()+'.json';a.click();toast('备份已导出')}
+document.getElementById('importFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!Array.isArray(x.cards)||!Array.isArray(x.phones))throw 0;db=x;save();toast('恢复成功')}catch(e){alert('备份文件格式不正确')}};r.readAsText(f)});
+function resetAll(){if(confirm('确定清空所有信用卡、固定支出和手机号吗？此操作不可恢复，请先备份。')){db={cards:[],phones:[],settings:{currency:'JPY'}};save()}}
+render();
+</script>
+</body>
+</html>
